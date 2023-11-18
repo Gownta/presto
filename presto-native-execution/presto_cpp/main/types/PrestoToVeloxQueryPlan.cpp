@@ -14,8 +14,8 @@
 
 // clang-format off
 #include "presto_cpp/main/types/PrestoToVeloxQueryPlan.h"
-#include <velox/type/Filter.h>
-#include <velox/type/fbhive/HiveTypeParser.h>
+#include "velox/core/Expressions.h"
+#include "velox/common/compression/Compression.h"
 #include "velox/connectors/hive/HiveConnector.h"
 #include "velox/connectors/hive/HiveDataSink.h"
 #include "velox/connectors/hive/HivePartitionFunction.h"
@@ -25,10 +25,18 @@
 #include "velox/exec/HashPartitionFunction.h"
 #include "velox/exec/RoundRobinPartitionFunction.h"
 #include "velox/expression/Expr.h"
+#include "velox/type/Filter.h"
+#include "velox/type/fbhive/HiveTypeParser.h"
+
 #include "velox/vector/ComplexVector.h"
 #include "velox/vector/FlatVector.h"
-#include "velox/core/Expressions.h"
-#include "velox/common/compression/Compression.h"
+
+#include "presto_cpp/main/SystemConnector.h"
+#include "presto_cpp/main/operators/BroadcastWrite.h"
+#include "presto_cpp/main/operators/PartitionAndSerialize.h"
+#include "presto_cpp/main/operators/ShuffleWrite.h"
+#include "presto_cpp/main/operators/ShuffleRead.h"
+
 // clang-format on
 
 #include <folly/String.h>
@@ -146,6 +154,11 @@ std::shared_ptr<connector::ColumnHandle> toColumnHandle(
           dynamic_cast<const protocol::TpchColumnHandle*>(column)) {
     return std::make_shared<connector::tpch::TpchColumnHandle>(
         tpchColumn->columnName);
+  }
+
+  if (auto systemColumn =
+          dynamic_cast<const protocol::SystemColumnHandle*>(column)) {
+    return std::make_shared<SystemColumnHandle>(systemColumn->columnName);
   }
 
   VELOX_UNSUPPORTED(
@@ -945,6 +958,16 @@ std::shared_ptr<connector::ConnectorTableHandle> toConnectorTableHandle(
         tpch::fromTableName(tpchLayout->table.tableName),
         tpchLayout->table.scaleFactor);
   }
+
+  if (auto systemLayout =
+          std::dynamic_pointer_cast<const protocol::SystemTableLayoutHandle>(
+              tableHandle.connectorTableLayout)) {
+    return std::make_shared<SystemTableHandle>(
+        tableHandle.connectorId,
+        systemLayout->table.schemaName,
+        systemLayout->table.tableName);
+  }
+
   VELOX_UNSUPPORTED(
       "Unsupported TableHandle type: {}.", toJsonString(tableHandle));
 }
