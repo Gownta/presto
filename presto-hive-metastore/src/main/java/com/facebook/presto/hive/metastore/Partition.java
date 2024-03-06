@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 
 import javax.annotation.concurrent.Immutable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class Partition
     private final boolean sealedPartition;
     private final int createTime;
     private final long lastDataCommitTime;
+    private final byte[] id;
 
     @JsonCreator
     public Partition(
@@ -71,6 +73,35 @@ public class Partition
         this.sealedPartition = sealedPartition;
         this.createTime = createTime;
         this.lastDataCommitTime = lastDataCommitTime;
+        this.id = new byte[0];
+    }
+
+    public Partition(
+            String databaseName,
+            String tableName,
+            List<String> values,
+            Storage storage,
+            List<Column> columns,
+            Map<String, String> parameters,
+            Optional<Long> partitionVersion,
+            boolean eligibleToIgnore,
+            boolean sealedPartition,
+            int createTime,
+            long lastDataCommitTime,
+            byte[] id)
+    {
+        this.databaseName = requireNonNull(databaseName, "databaseName is null");
+        this.tableName = requireNonNull(tableName, "tableName is null");
+        this.values = ImmutableList.copyOf(requireNonNull(values, "values is null"));
+        this.storage = requireNonNull(storage, "storage is null");
+        this.columns = ImmutableList.copyOf(requireNonNull(columns, "columns is null"));
+        this.parameters = ImmutableMap.copyOf(requireNonNull(parameters, "parameters is null"));
+        this.partitionVersion = requireNonNull(partitionVersion, "partitionVersion is null");
+        this.eligibleToIgnore = eligibleToIgnore;
+        this.sealedPartition = sealedPartition;
+        this.createTime = createTime;
+        this.lastDataCommitTime = lastDataCommitTime;
+        this.id = id;
     }
 
     @JsonProperty
@@ -145,6 +176,15 @@ public class Partition
         return lastDataCommitTime;
     }
 
+    @JsonProperty
+    public byte[] getId()
+    {
+        if (id == null) {
+            return new byte[0];
+        }
+        return Arrays.copyOf(id, id.length);
+    }
+
     @Override
     public String toString()
     {
@@ -208,6 +248,7 @@ public class Partition
         private boolean isSealedPartition = true;
         private int createTime;
         private long lastDataCommitTime;
+        private byte[] id;
 
         private Builder()
         {
@@ -226,6 +267,7 @@ public class Partition
             this.isEligibleToIgnore = partition.isEligibleToIgnore();
             this.createTime = partition.getCreateTime();
             this.lastDataCommitTime = partition.getLastDataCommitTime();
+            this.id = partition.getId();
         }
 
         public Builder setDatabaseName(String databaseName)
@@ -299,9 +341,15 @@ public class Partition
             return this;
         }
 
+        public Builder setId(byte[] id)
+        {
+            this.id = id;
+            return this;
+        }
+
         public Partition build()
         {
-            return new Partition(databaseName, tableName, values, storageBuilder.build(), columns, parameters, partitionVersion, isEligibleToIgnore, isSealedPartition, createTime, lastDataCommitTime);
+            return new Partition(databaseName, tableName, values, storageBuilder.build(), columns, parameters, partitionVersion, isEligibleToIgnore, isSealedPartition, createTime, lastDataCommitTime, id);
         }
     }
 }
