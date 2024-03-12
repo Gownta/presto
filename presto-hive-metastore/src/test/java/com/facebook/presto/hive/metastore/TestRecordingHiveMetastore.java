@@ -117,7 +117,7 @@ public class TestRecordingHiveMetastore
             true,
             0,
             0,
-            new byte[0]);
+            Optional.of(new byte[0]));
     private static final PartitionStatistics PARTITION_STATISTICS = new PartitionStatistics(
             new HiveBasicStatistics(10, 11, 10000, 10001),
             ImmutableMap.of("column", new HiveColumnStatistics(

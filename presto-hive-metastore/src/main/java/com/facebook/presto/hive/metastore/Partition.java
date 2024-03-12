@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public class Partition
     private final boolean sealedPartition;
     private final int createTime;
     private final long lastDataCommitTime;
-    private final byte[] rowIdPartitionComponent;
+    private final Optional<byte[]> rowIdPartitionComponent;
 
     @JsonCreator
     public Partition(
@@ -74,7 +73,7 @@ public class Partition
         this.sealedPartition = sealedPartition;
         this.createTime = createTime;
         this.lastDataCommitTime = lastDataCommitTime;
-        this.rowIdPartitionComponent = new byte[0];
+        this.rowIdPartitionComponent = Optional.empty();
     }
 
     public Partition(
@@ -89,7 +88,7 @@ public class Partition
             boolean sealedPartition,
             int createTime,
             long lastDataCommitTime,
-            byte[] rowIdPartitionComponent)
+            Optional<byte[]> rowIdPartitionComponent)
     {
         this.databaseName = requireNonNull(databaseName, "databaseName is null");
         this.tableName = requireNonNull(tableName, "tableName is null");
@@ -102,6 +101,9 @@ public class Partition
         this.sealedPartition = sealedPartition;
         this.createTime = createTime;
         this.lastDataCommitTime = lastDataCommitTime;
+        if (rowIdPartitionComponent == null) {
+            rowIdPartitionComponent = Optional.empty();
+        }
         this.rowIdPartitionComponent = rowIdPartitionComponent;
     }
 
@@ -182,13 +184,13 @@ public class Partition
      * specific partition in a specific table.
      */
     @JsonProperty
-    @Nullable
-    public byte[] getRowIdPartitionComponent()
+    public Optional<byte[]> getRowIdPartitionComponent()
     {
-        if (rowIdPartitionComponent == null) {
-            return new byte[0];
+        if (rowIdPartitionComponent.isPresent()) {
+            byte[] copy = Arrays.copyOf(rowIdPartitionComponent.get(), rowIdPartitionComponent.get().length);
+            return Optional.of(copy);
         }
-        return Arrays.copyOf(rowIdPartitionComponent, rowIdPartitionComponent.length);
+        return Optional.empty();
     }
 
     @Override
@@ -254,7 +256,7 @@ public class Partition
         private boolean isSealedPartition = true;
         private int createTime;
         private long lastDataCommitTime;
-        private byte[] rowIdPartitionComponent;
+        private Optional<byte[]> rowIdPartitionComponent = Optional.empty();
 
         private Builder()
         {
@@ -352,7 +354,7 @@ public class Partition
          * specific partition in a specific table. This value will normally be
          * supplied by Metastore, along with other metadata.
          */
-        public Builder setRowIdPartitionComponent(byte[] rowIdPartitionComponent)
+        public Builder setRowIdPartitionComponent(Optional<byte[]> rowIdPartitionComponent)
         {
             this.rowIdPartitionComponent = rowIdPartitionComponent;
             return this;

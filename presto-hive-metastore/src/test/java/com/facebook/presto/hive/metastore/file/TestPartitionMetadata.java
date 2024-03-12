@@ -114,7 +114,7 @@ public class TestPartitionMetadata
                 ImmutableMap.of(),
                 false,
                 false,
-                new byte[0]);
+                Optional.of(new byte[0]));
     }
 
     private static Column column(String name)
