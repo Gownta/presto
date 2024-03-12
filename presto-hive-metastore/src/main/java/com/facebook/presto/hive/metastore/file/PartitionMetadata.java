@@ -139,7 +139,7 @@ public class PartitionMetadata
         columnStatistics = ImmutableMap.copyOf(statistics.getColumnStatistics());
         eligibleToIgnore = partition.isEligibleToIgnore();
         sealedPartition = partition.isSealedPartition();
-        this.id = partition.getId();
+        this.id = partition.getRowIdPartitionComponent();
     }
 
     @JsonProperty
