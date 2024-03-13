@@ -106,7 +106,7 @@ public class OrcBatchPageSource
 
         this.stats = requireNonNull(stats, "stats is null");
         this.runtimeStats = requireNonNull(runtimeStats, "runtimeStats is null");
-        this.isRowPositionList = requireNonNull(isRowPositionList, "rowPosIndices is null");
+        this.isRowPositionList = requireNonNull(isRowPositionList, "isRowPositionList is null");
 
         this.constantBlocks = new Block[size];
         this.hiveColumnIndexes = new int[size];
