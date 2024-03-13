@@ -83,6 +83,12 @@ public class OrcBatchPageSource
         this(recordReader, orcDataSource, columns, typeManager, systemMemoryContext, stats, runtimeStats, nCopies(columns.size(), false));
     }
 
+    /**
+     * @param columns an ordered list of the fields to read
+     * @param isRowPositionList list of indices of columns. If true, then the column with the matching
+     *     index is a row number. If false, it isn't. This should have the same length as {@code columns},
+     *     and the columns in each list should match up.
+     */
     public OrcBatchPageSource(
             OrcBatchRecordReader recordReader,
             OrcDataSource orcDataSource,
