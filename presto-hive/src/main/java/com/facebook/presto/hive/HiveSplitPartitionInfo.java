@@ -46,6 +46,8 @@ public class HiveSplitPartitionInfo
     private final TableToPartitionMapping tableToPartitionMapping;
     private final Optional<HiveSplit.BucketConversion> bucketConversion;
     private final Set<ColumnHandle> redundantColumnDomains;
+    // TODO fill this in
+    private final Optional<byte[]> rowIdPartitionComponent = Optional.empty();
 
     // keep track of how many InternalHiveSplits reference this PartitionInfo.
     private final AtomicInteger references = new AtomicInteger(0);
@@ -110,6 +112,11 @@ public class HiveSplitPartitionInfo
     public String getPartitionName()
     {
         return partitionName;
+    }
+
+    public Optional<byte[]> getRowIdPartitionComponent()
+    {
+        return rowIdPartitionComponent;
     }
 
     public int getPartitionDataColumnCount()

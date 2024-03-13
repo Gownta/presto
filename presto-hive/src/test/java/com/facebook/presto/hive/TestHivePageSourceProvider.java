@@ -191,7 +191,8 @@ public class TestHivePageSourceProvider
                 new CacheQuotaRequirement(PARTITION, Optional.of(DataSize.succinctDataSize(1, DataSize.Unit.MEGABYTE))),
                 Optional.empty(),
                 ImmutableSet.of(),
-                SplitWeight.standard());
+                SplitWeight.standard(),
+                Optional.empty());
 
         cacheQuota = HivePageSourceProvider.generateCacheQuota(split);
         expectedCacheQuota = new CacheQuota(SCHEMA_NAME + "." + TABLE_NAME + "." + PARTITION_NAME, Optional.of(DataSize.succinctDataSize(1, DataSize.Unit.MEGABYTE)));
@@ -471,7 +472,8 @@ public class TestHivePageSourceProvider
                 NO_CACHE_REQUIREMENT,
                 Optional.empty(),
                 ImmutableSet.of(),
-                SplitWeight.standard());
+                SplitWeight.standard(),
+                Optional.empty());
     }
 
     static class MockHiveBatchPageSourceFactory
