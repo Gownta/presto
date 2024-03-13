@@ -161,7 +161,8 @@ public class TestHivePageSourceProvider
                 NO_CACHE_REQUIREMENT,
                 Optional.empty(),
                 ImmutableSet.of(),
-                SplitWeight.standard());
+                SplitWeight.standard(),
+                Optional.empty());
 
         CacheQuota cacheQuota = HivePageSourceProvider.generateCacheQuota(split);
         CacheQuota expectedCacheQuota = new CacheQuota(".", Optional.empty());
